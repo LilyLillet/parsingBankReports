@@ -89,28 +89,26 @@ def get_sber_operations_list(file_path):
             new_columns.append(gg.columns[i])
     sber_data = gg.iloc[1:]
     sber_data.columns = new_columns
-    print(sber_data.columns)
     fin_operations = list()
 
     for row in sber_data.iterrows():
+        d = str(row[1]['Дата проводки'])
+        if d == 'nan':
+            continue
+        elif d == 'б/с':
+            break
         dt = datetime.datetime.strptime(str(row[1]['Дата проводки']), '%Y-%m-%d %H:%M:%S')
         date = dt.date()
-        print(date)
         comment = row[1]['Назначение платежа']
-        print(comment)
         dbt = row[1]['Сумма по дебету']
-        print(dbt)
         crdt = row[1]['Сумма по кредиту']
-        print(crdt)
         if is_digit(dbt):
             operation_type = 'Debit'
-            counterparty = row[1]['Счет']
-            print(counterparty)
+            counterparty = row[1]['Кредит']
             payment = float(dbt)
         else:
             operation_type = 'Credit'
-            counterparty = row[1]['Кредит']
-            print(counterparty)
+            counterparty = row[1]['Счет']
             payment = float(crdt)
         fin_operations.append(finOperation(date, operation_type, counterparty, payment, comment))
     return fin_operations
